@@ -1,15 +1,17 @@
-import { Navbar, InvoiceTable, ProcessingBar, ProcessingModal } from './components';
+import { Navbar, InvoiceTable, ProcessingBar, ProcessingModal, useInvoiceProcessing } from './components';
 import { useState } from 'react';
+import { useApi } from './hooks/useApi';
 
 function App() {
+  const [initialInvoices, setInjected] = useApi('/invoices');
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState(new Set<string>());
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingProgress, setProcessingProgress] = useState({
-    current: 0,
-    total: 0,
-    currentInvoiceId: undefined as string | undefined,
-    status: 'idle' as 'idle' | 'processing' | 'completed' | 'error'
-  });
+  
+  const {
+    isProcessing,
+    processingProgress,
+    handleProcessSelected,
+    handleCloseModal
+  } = useInvoiceProcessing(setInjected);
 
   const handleInvoiceSelection = (invoiceId: string, isSelected: boolean) => {
     setSelectedInvoiceIds(prev => {
@@ -23,60 +25,12 @@ function App() {
     });
   };
 
-  const processInvoices = async (invoiceIds: string[]) => {
-    setIsProcessing(true);
-    setProcessingProgress({
-      current: 0,
-      total: invoiceIds.length,
-      currentInvoiceId: undefined,
-      status: 'idle'
-    });
-
-    try {
-      setProcessingProgress(prev => ({ ...prev, status: 'processing' }));
-
-      for (let i = 0; i < invoiceIds.length; i++) {
-        const invoiceId = invoiceIds[i];
-        
-        setProcessingProgress(prev => ({
-          ...prev,
-          current: i,
-          currentInvoiceId: invoiceId
-        }));
-
-        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-      }
-
-      setProcessingProgress(prev => ({
-        ...prev,
-        current: invoiceIds.length,
-        currentInvoiceId: undefined,
-        status: 'completed'
-      }));
-    } catch (error) {
-      console.error('Error processing invoices:', error);
-      setProcessingProgress(prev => ({
-        ...prev,
-        status: 'error'
-      }));
-    }
+  const onProcessSelected = () => {
+    handleProcessSelected(selectedInvoiceIds);
   };
 
-  const handleProcessSelected = () => {
-    const invoiceIds = Array.from(selectedInvoiceIds);
-    processInvoices(invoiceIds);
-  };
-
-  const handleCloseModal = () => {
-    if (processingProgress.status !== 'processing') {
-      setIsProcessing(false);
-      setProcessingProgress({
-        current: 0,
-        total: 0,
-        currentInvoiceId: undefined,
-        status: 'idle'
-      });
-    }
+  const onCloseModal = () => {
+    handleCloseModal(() => setSelectedInvoiceIds(new Set()));
   };
 
   return (
@@ -87,10 +41,11 @@ function App() {
         <div className="p-6 space-y-4">
           <ProcessingBar 
             selectedInvoiceIds={selectedInvoiceIds}
-            onProcessSelected={handleProcessSelected}
+            onProcessSelected={onProcessSelected}
           />
           
           <InvoiceTable 
+            apiData={initialInvoices}
             selectedInvoiceIds={selectedInvoiceIds}
             onInvoiceSelection={handleInvoiceSelection}
           />
@@ -99,7 +54,7 @@ function App() {
 
       {isProcessing && (
         <ProcessingModal
-          onClose={handleCloseModal}
+          onClose={onCloseModal}
           progress={processingProgress}
         />
       )}

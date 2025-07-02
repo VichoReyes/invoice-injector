@@ -8,15 +8,15 @@ type Invoice = {
   injected?: boolean
 }
 
-interface ApiState<T> {
+export interface ApiState {
   data: Invoice[] | null;
   loading: boolean;
   error: string | null;
 }
 
 // url should start with a slash
-export function useApi<T>(url: string): ApiState<T> {
-  const [state, setState] = useState<ApiState<T>>({
+export function useApi(url: string): [ApiState, (invoiceIds: string[]) => void] {
+  const [state, setState] = useState<ApiState>({
     data: null,
     loading: true,
     error: null,
@@ -67,5 +67,40 @@ export function useApi<T>(url: string): ApiState<T> {
     };
   }, [url]);
 
-  return state;
-} 
+  function setInjected(recentlyInjected: string[]) {
+    if (!state.data) {
+      return;
+    }
+    const copy = state.data.map(invoice => ({ ...invoice, injected: recentlyInjected.includes(invoice.id) }));
+    setState(prev => ({ ...prev, data: copy }));
+  }
+
+  return [state, setInjected];
+}
+
+// Process a batch of invoices
+export async function processInvoiceBatch(invoiceIds: string[]): Promise<void | 'server_error'> {
+  const token = import.meta.env.VITE_AUTH_TOKEN;
+  const baseUrl = import.meta.env.VITE_BASE_URL || 'https://recruiting.data.bemmbo.com';
+  
+  const response = await fetch(`${baseUrl}/invoices/inject`, {
+    method: 'POST',
+    headers: {
+      'Authorization': token ? `${token}` : '',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ invoiceIds }),
+  });
+
+  if (!response.ok) {
+    if (response.status === 500) {
+      return 'server_error';
+    }
+    if (response.status === 400) {
+      // TODO: ignore "already injected" errors
+    }
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+}

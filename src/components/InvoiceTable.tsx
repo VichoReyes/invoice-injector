@@ -1,5 +1,5 @@
-import { useApi } from '../hooks/useApi';
 import { useState } from 'react';
+import type { ApiState } from '../hooks/useApi';
 
 function Button({ onClick, disabled, children }: {
   onClick?: () => void;
@@ -20,11 +20,12 @@ function Button({ onClick, disabled, children }: {
 interface InvoiceTableProps {
   selectedInvoiceIds: Set<string>;
   onInvoiceSelection: (invoiceId: string, isSelected: boolean) => void;
+  apiData: ApiState;
 }
 
-export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection }: InvoiceTableProps) {
-  const { data, loading, error } = useApi('/invoices');
+export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }: InvoiceTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const { data, loading, error } = apiData;
   const itemsPerPage = 10;
 
   if (loading) return <div>Loading...</div>;
@@ -34,7 +35,7 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection }: Invoice
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const invoices = data?.slice(startIndex, endIndex);
+  const pageInvoices = data?.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -113,7 +114,7 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection }: Invoice
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {invoices?.map((invoice, index) => (
+            {pageInvoices?.map((invoice, index) => (
               <tr key={invoice.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
                 <td className={`${tdClass}`}>
                   <input 
