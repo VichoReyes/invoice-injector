@@ -16,7 +16,7 @@ function ProcessingBar({ selectedInvoiceIds, onProcessSelected }: {
         <button
           onClick={onProcessSelected}
           disabled={selectedCount === 0}
-          className="bg-blue-200 text-gray-800 px-4 py-2 rounded disabled:bg-gray-50"
+          className="bg-blue-200 text-gray-800 disabled:bg-gray-50"
         >
           Process Selected
         </button>

@@ -10,7 +10,7 @@ function Button({ onClick, disabled, children }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center p-1 m-1 border border-gray-300 text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+      className={`inline-flex items-center p-1 m-1 border border-gray-300 text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
     >
       {children}
     </button>
@@ -87,7 +87,7 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection }: Invoice
     return pages;
   };
 
-  const headerClass = "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider";
+  const headerClass = "px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider";
   const tdClass = "px-6 py-4 whitespace-nowrap";
 
   return (
@@ -123,17 +123,17 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection }: Invoice
                     onChange={(e) => onInvoiceSelection(invoice.id, e.target.checked)}
                   />
                 </td>
-                <td className={`${tdClass} text-sm font-medium text-gray-900`}>
+                <td className={`${tdClass} text-sm text-gray-900`}>
                   {invoice.receiverName}
                 </td>
-                <td className={`${tdClass} text-sm text-gray-900 font-semibold`}>
+                <td className={`${tdClass} text-sm text-gray-900`}>
                   {invoice.amount.toLocaleString()}
                 </td>
                 <td className={`${tdClass} text-sm text-gray-500 uppercase`}>
                   {invoice.currency}
                 </td>
                 <td className={`${tdClass}`}>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                  <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
                     invoice.injected 
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-red-100 text-red-800'
