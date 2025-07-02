@@ -14,6 +14,37 @@ export interface ApiState {
   error: string | null;
 }
 
+// Global token management
+let globalToken: string | null = null;
+
+function getAuthToken(): string {
+  // First check if we already have a token
+  if (globalToken) {
+    return globalToken;
+  }
+
+  // Check environment variable first
+  const envToken = import.meta.env.VITE_AUTH_TOKEN;
+  if (envToken) {
+    globalToken = envToken;
+    return envToken;
+  }
+
+  // If no env var, prompt the user
+  const userToken = prompt('Please enter your authentication token:');
+  if (!userToken) {
+    throw new Error('Authentication token is required');
+  }
+
+  const trimmedToken = userToken.trim();
+  if (trimmedToken === '') {
+    throw new Error('Authentication token is required');
+  }
+
+  globalToken = trimmedToken;
+  return trimmedToken;
+}
+
 // url should start with a slash
 export function useApi(url: string): [ApiState, (invoiceIds: string[]) => void] {
   const [state, setState] = useState<ApiState>({
@@ -24,12 +55,13 @@ export function useApi(url: string): [ApiState, (invoiceIds: string[]) => void] 
 
   useEffect(() => {
     let isMounted = true;
-    const token = import.meta.env.VITE_AUTH_TOKEN;
     const baseUrl = import.meta.env.VITE_BASE_URL || 'https://recruiting.data.bemmbo.com';
 
     const fetchData = async () => {
       try {
         setState(prev => ({ ...prev, loading: true, error: null }));
+        
+        const token = getAuthToken();
         
         const response = await fetch(`${baseUrl}${url}`, {
           headers: {
@@ -80,7 +112,7 @@ export function useApi(url: string): [ApiState, (invoiceIds: string[]) => void] 
 
 // Process a batch of invoices
 export async function processInvoiceBatch(invoiceIds: string[]): Promise<void | 'server_error'> {
-  const token = import.meta.env.VITE_AUTH_TOKEN;
+  const token = getAuthToken();
   const baseUrl = import.meta.env.VITE_BASE_URL || 'https://recruiting.data.bemmbo.com';
   
   const response = await fetch(`${baseUrl}/invoices/inject`, {
