@@ -17,7 +17,12 @@ function Button({ onClick, disabled, children }: {
   );
 }
 
-export function InvoiceTable() {
+interface InvoiceTableProps {
+  selectedInvoiceIds: Set<string>;
+  onInvoiceSelection: (invoiceId: string, isSelected: boolean) => void;
+}
+
+export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection }: InvoiceTableProps) {
   const { data, loading, error } = useApi('/invoices');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -113,7 +118,9 @@ export function InvoiceTable() {
                 <td className={`${tdClass}`}>
                   <input 
                     type="checkbox" 
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    checked={selectedInvoiceIds.has(invoice.id)}
+                    onChange={(e) => onInvoiceSelection(invoice.id, e.target.checked)}
                   />
                 </td>
                 <td className={`${tdClass} text-sm font-medium text-gray-900`}>
