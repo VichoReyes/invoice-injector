@@ -37,6 +37,17 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
   const endIndex = startIndex + itemsPerPage;
   const pageInvoices = data?.slice(startIndex, endIndex);
 
+  // Header checkbox logic
+  const nonInjectedPageInvoices = pageInvoices?.filter(invoice => !invoice.injected) || [];
+  const selectedNonInjectedCount = nonInjectedPageInvoices.filter(invoice => selectedInvoiceIds.has(invoice.id)).length;
+  const isAllSelected = nonInjectedPageInvoices.length > 0 && selectedNonInjectedCount === nonInjectedPageInvoices.length;
+
+  const handleSelectAllPage = (checked: boolean) => {
+    nonInjectedPageInvoices.forEach(invoice => {
+      onInvoiceSelection(invoice.id, checked);
+    });
+  };
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -98,6 +109,13 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
           <thead className="bg-gray-50">
             <tr>
               <th className={`${headerClass} w-12`}>
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  checked={isAllSelected}
+                  disabled={nonInjectedPageInvoices.length === 0}
+                  onChange={(e) => handleSelectAllPage(e.target.checked)}
+                />
               </th>
               <th className={headerClass}>
                 Emisor
