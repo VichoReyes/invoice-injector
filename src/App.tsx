@@ -1,32 +1,15 @@
-import { Navbar, InvoiceTable } from './components';
+import { Navbar, InvoiceTable, ProcessingBar, ProcessingModal } from './components';
 import { useState } from 'react';
-
-function ProcessingBar({ selectedInvoiceIds, onProcessSelected }: {
-  selectedInvoiceIds: Set<string>;
-  onProcessSelected: () => void;
-}) {
-  const selectedCount = selectedInvoiceIds.size;
-  
-  return (
-    <div className="bg-white p-4 rounded-lg border">
-      <div className="flex justify-between items-center">
-        <span className="hidden md:block text-sm text-gray-600">
-          Has seleccionado {selectedCount} facturas
-        </span>
-        <button
-          onClick={onProcessSelected}
-          disabled={selectedCount === 0}
-          className="bg-blue-200 text-gray-800 disabled:bg-gray-50"
-        >
-          Procesar facturas seleccionadas
-        </button>
-      </div>
-    </div>
-  );
-}
 
 function App() {
   const [selectedInvoiceIds, setSelectedInvoiceIds] = useState(new Set<string>());
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState({
+    current: 0,
+    total: 0,
+    currentInvoiceId: undefined as string | undefined,
+    status: 'idle' as 'idle' | 'processing' | 'completed' | 'error'
+  });
 
   const handleInvoiceSelection = (invoiceId: string, isSelected: boolean) => {
     setSelectedInvoiceIds(prev => {
@@ -40,9 +23,60 @@ function App() {
     });
   };
 
+  const processInvoices = async (invoiceIds: string[]) => {
+    setIsProcessing(true);
+    setProcessingProgress({
+      current: 0,
+      total: invoiceIds.length,
+      currentInvoiceId: undefined,
+      status: 'idle'
+    });
+
+    try {
+      setProcessingProgress(prev => ({ ...prev, status: 'processing' }));
+
+      for (let i = 0; i < invoiceIds.length; i++) {
+        const invoiceId = invoiceIds[i];
+        
+        setProcessingProgress(prev => ({
+          ...prev,
+          current: i,
+          currentInvoiceId: invoiceId
+        }));
+
+        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      }
+
+      setProcessingProgress(prev => ({
+        ...prev,
+        current: invoiceIds.length,
+        currentInvoiceId: undefined,
+        status: 'completed'
+      }));
+    } catch (error) {
+      console.error('Error processing invoices:', error);
+      setProcessingProgress(prev => ({
+        ...prev,
+        status: 'error'
+      }));
+    }
+  };
+
   const handleProcessSelected = () => {
-    // TODO: Implement processing logic
-    console.log('Processing invoices:', Array.from(selectedInvoiceIds));
+    const invoiceIds = Array.from(selectedInvoiceIds);
+    processInvoices(invoiceIds);
+  };
+
+  const handleCloseModal = () => {
+    if (processingProgress.status !== 'processing') {
+      setIsProcessing(false);
+      setProcessingProgress({
+        current: 0,
+        total: 0,
+        currentInvoiceId: undefined,
+        status: 'idle'
+      });
+    }
   };
 
   return (
@@ -62,6 +96,13 @@ function App() {
           />
         </div>
       </div>
+
+      {isProcessing && (
+        <ProcessingModal
+          onClose={handleCloseModal}
+          progress={processingProgress}
+        />
+      )}
     </>
   )
 }
