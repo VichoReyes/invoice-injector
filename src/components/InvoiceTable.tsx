@@ -10,7 +10,7 @@ function Button({ onClick, disabled, children }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center p-1 m-1 border border-gray-300 text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+      className={`m-1`}
     >
       {children}
     </button>

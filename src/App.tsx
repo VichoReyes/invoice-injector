@@ -81,7 +81,7 @@ function App() {
 
   return (
     <>
-      <div className="bg-slate-50 w-screen h-screen">
+      <div className="w-screen h-screen">
         <Navbar />
         
         <div className="p-6 space-y-4">
