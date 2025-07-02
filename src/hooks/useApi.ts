@@ -108,7 +108,7 @@ export function useApi(
     }
     const copy = state.data.map((invoice) => ({
       ...invoice,
-      injected: recentlyInjected.includes(invoice.id),
+      injected: invoice.injected || recentlyInjected.includes(invoice.id),
     }));
     setState((prev) => ({ ...prev, data: copy }));
   }

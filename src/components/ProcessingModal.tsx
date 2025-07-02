@@ -105,6 +105,7 @@ export function useInvoiceProcessing(
     setIsProcessing(true);
 
     const batches = createBatches(invoiceIds);
+    const allProcessedInvoiceIds: string[] = [];
 
     setProcessingProgress({
       batches,
@@ -119,7 +120,12 @@ export function useInvoiceProcessing(
         if (!success) {
           throw new Error(`Failed to process batch ${batch.id}`);
         }
+        // Accumulate processed invoice IDs for final update
+        allProcessedInvoiceIds.push(...batch.invoiceIds);
       }
+
+      // Final call to ensure all invoices are marked as injected
+      setInjected(allProcessedInvoiceIds);
 
       setProcessingProgress((prev) => ({
         ...prev,
