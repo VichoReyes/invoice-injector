@@ -1,6 +1,22 @@
 import { useApi } from '../hooks/useApi';
 import { useState } from 'react';
 
+function Button({ onClick, disabled, children }: {
+  onClick?: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`inline-flex items-center p-1 m-1 border border-gray-300 text-sm font-medium text-gray-500 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function InvoiceTable() {
   const { data, loading, error } = useApi('/invoices');
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,7 +87,7 @@ export function InvoiceTable() {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -124,24 +140,24 @@ export function InvoiceTable() {
         </table>
       </div>
 
+      {/* Pagination Controls */}
       <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
         {/* Mobile Controls */}
         <div className="flex-1 flex justify-between sm:hidden">
-          <button
+          <Button
             onClick={handlePrevious}
             disabled={currentPage === 1}
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Anterior
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleNext}
             disabled={currentPage === totalPages}
-            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Siguiente
-          </button>
+          </Button>
         </div>
+        
         {/* Desktop Controls */}
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
@@ -156,50 +172,43 @@ export function InvoiceTable() {
             </p>
           </div>
           <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <button
+            <nav className="inline-flex rounded-md shadow-sm -space-x-px">
+              <Button
                 onClick={handlePrevious}
                 disabled={currentPage === 1}
-                className="relative inline-flex items-center p-1 m-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="sr-only">Anterior</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-              </button>
+              </Button>
               
               {getPageNumbers().map((page, index) => (
                 <span key={index}>
                   {page === '...' ? (
-                    <span className="relative inline-flex items-center p-1 m-1 bg-white text-sm font-medium text-gray-700">
+                    <span className="inline-flex items-center p-1 m-1 text-gray-700">
                       ...
                     </span>
                   ) : (
-                    <button
-                      onClick={() => handlePageChange(page as number)}
-                      disabled={page === currentPage}
-                      className={`relative inline-flex items-center p-1 m-1 border text-sm font-medium ${
-                        currentPage === page
-                          ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                          : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                      }`}
+                    <Button
+                      onClick={currentPage === page ? undefined : () => handlePageChange(page as number)}
+                      disabled={currentPage === page}
                     >
                       {page}
-                    </button>
+                    </Button>
                   )}
                 </span>
               ))}
               
-              <button
+              <Button
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
-                className="relative inline-flex items-center p-1 m-1 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="sr-only">Siguiente</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
-              </button>
+              </Button>
             </nav>
           </div>
         </div>
