@@ -6,7 +6,8 @@ interface ApiState<T> {
   error: string | null;
 }
 
-export function useApi<T>(url: string, token?: string): ApiState<T> {
+// url should start with a slash
+export function useApi<T>(url: string): ApiState<T> {
   const [state, setState] = useState<ApiState<T>>({
     data: null,
     loading: true,
@@ -15,12 +16,14 @@ export function useApi<T>(url: string, token?: string): ApiState<T> {
 
   useEffect(() => {
     let isMounted = true;
+    const token = import.meta.env.VITE_AUTH_TOKEN;
+    const baseUrl = import.meta.env.VITE_BASE_URL || 'https://recruiting.data.bemmbo.com';
 
     const fetchData = async () => {
       try {
         setState(prev => ({ ...prev, loading: true, error: null }));
         
-        const response = await fetch(url, {
+        const response = await fetch(`${baseUrl}${url}`, {
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json',
@@ -54,7 +57,7 @@ export function useApi<T>(url: string, token?: string): ApiState<T> {
     return () => {
       isMounted = false;
     };
-  }, [url, token]);
+  }, [url]);
 
   return state;
 } 
