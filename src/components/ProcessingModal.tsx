@@ -3,6 +3,19 @@ import { processInvoiceBatch } from '../hooks/useApi';
 
 type BatchStatus = 'not started' | 'in progress' | 'retrying' | 'successfully processed';
 
+function showBatchStatus(status: BatchStatus): string {
+  switch (status) {
+    case 'not started':
+      return 'No iniciado';
+    case 'in progress':
+      return 'En progreso';
+    case 'retrying':
+      return 'Reintentando';
+    case 'successfully processed':
+      return 'Procesado exitosamente';
+  }
+}
+
 interface BatchInfo {
   id: number;
   invoiceIds: string[];
@@ -183,7 +196,7 @@ export function ProcessingModal({ onClose, progress }: ProcessingModalProps) {
                 batch.status === 'in progress' ? 'text-blue-600' : 
                 'text-gray-500'
               }`}>
-                {batch.status}
+                {showBatchStatus(batch.status)}
               </span>
             </div>
           ))}
