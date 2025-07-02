@@ -1,17 +1,17 @@
-import { useState } from 'react';
-import type { ApiState } from '../hooks/useApi';
+import { useState } from "react";
+import type { ApiState } from "../hooks/useApi";
 
-function Button({ onClick, disabled, children }: {
+function Button({
+  onClick,
+  disabled,
+  children,
+}: {
   onClick?: () => void;
   disabled?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`m-1`}
-    >
+    <button onClick={onClick} disabled={disabled} className={`m-1`}>
       {children}
     </button>
   );
@@ -23,7 +23,11 @@ interface InvoiceTableProps {
   apiData: ApiState;
 }
 
-export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }: InvoiceTableProps) {
+export function InvoiceTable({
+  selectedInvoiceIds,
+  onInvoiceSelection,
+  apiData,
+}: InvoiceTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const { data, loading, error } = apiData;
   const itemsPerPage = 10;
@@ -38,12 +42,17 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
   const pageInvoices = data?.slice(startIndex, endIndex);
 
   // Header checkbox logic
-  const nonInjectedPageInvoices = pageInvoices?.filter(invoice => !invoice.injected) || [];
-  const selectedNonInjectedCount = nonInjectedPageInvoices.filter(invoice => selectedInvoiceIds.has(invoice.id)).length;
-  const isAllSelected = nonInjectedPageInvoices.length > 0 && selectedNonInjectedCount === nonInjectedPageInvoices.length;
+  const nonInjectedPageInvoices =
+    pageInvoices?.filter((invoice) => !invoice.injected) || [];
+  const selectedNonInjectedCount = nonInjectedPageInvoices.filter((invoice) =>
+    selectedInvoiceIds.has(invoice.id),
+  ).length;
+  const isAllSelected =
+    nonInjectedPageInvoices.length > 0 &&
+    selectedNonInjectedCount === nonInjectedPageInvoices.length;
 
   const handleSelectAllPage = (checked: boolean) => {
-    nonInjectedPageInvoices.forEach(invoice => {
+    nonInjectedPageInvoices.forEach((invoice) => {
       onInvoiceSelection(invoice.id, checked);
     });
   };
@@ -67,7 +76,7 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -77,29 +86,30 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
         for (let i = 1; i <= 4; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = totalPages - 3; i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
         pages.push(1);
-        pages.push('...');
+        pages.push("...");
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           pages.push(i);
         }
-        pages.push('...');
+        pages.push("...");
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
-  const headerClass = "px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider";
+  const headerClass =
+    "px-6 py-3 text-left text-xs text-gray-500 uppercase tracking-wider";
   const tdClass = "px-6 py-4 whitespace-nowrap";
 
   return (
@@ -117,30 +127,29 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
                   onChange={(e) => handleSelectAllPage(e.target.checked)}
                 />
               </th>
-              <th className={headerClass}>
-                Emisor
-              </th>
-              <th className={headerClass}>
-                Monto
-              </th>
-              <th className={headerClass}>
-                Moneda
-              </th>
-              <th className={headerClass}>
-                Inyectado
-              </th>
+              <th className={headerClass}>Emisor</th>
+              <th className={headerClass}>Monto</th>
+              <th className={headerClass}>Moneda</th>
+              <th className={headerClass}>Inyectado</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {pageInvoices?.map((invoice, index) => (
-              <tr key={invoice.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+              <tr
+                key={invoice.id}
+                className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}`}
+              >
                 <td className={`${tdClass}`}>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     disabled={invoice.injected}
-                    checked={!invoice.injected && selectedInvoiceIds.has(invoice.id)}
-                    onChange={(e) => onInvoiceSelection(invoice.id, e.target.checked)}
+                    checked={
+                      !invoice.injected && selectedInvoiceIds.has(invoice.id)
+                    }
+                    onChange={(e) =>
+                      onInvoiceSelection(invoice.id, e.target.checked)
+                    }
                   />
                 </td>
                 <td className={`${tdClass} text-sm text-gray-900`}>
@@ -153,12 +162,14 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
                   {invoice.currency}
                 </td>
                 <td className={`${tdClass}`}>
-                  <span className={`inline-flex px-2 py-1 text-xs rounded-full ${
-                    invoice.injected 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {invoice.injected ? 'Sí' : 'No'}
+                  <span
+                    className={`inline-flex px-2 py-1 text-xs rounded-full ${
+                      invoice.injected
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {invoice.injected ? "Sí" : "No"}
                   </span>
                 </td>
               </tr>
@@ -171,54 +182,56 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
       <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
         {/* Mobile Controls */}
         <div className="flex-1 flex justify-between sm:hidden">
-          <Button
-            onClick={handlePrevious}
-            disabled={currentPage === 1}
-          >
+          <Button onClick={handlePrevious} disabled={currentPage === 1}>
             Anterior
           </Button>
-          <Button
-            onClick={handleNext}
-            disabled={currentPage === totalPages}
-          >
+          <Button onClick={handleNext} disabled={currentPage === totalPages}>
             Siguiente
           </Button>
         </div>
-        
+
         {/* Desktop Controls */}
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-gray-700">
-              Mostrando{' '}
-              <span className="font-medium">{startIndex + 1}</span>
-              {' '}a{' '}
-              <span className="font-medium">{Math.min(endIndex, totalItems)}</span>
-              {' '}de{' '}
-              <span className="font-medium">{totalItems}</span>
-              {' '}facturas
+              Mostrando <span className="font-medium">{startIndex + 1}</span> a{" "}
+              <span className="font-medium">
+                {Math.min(endIndex, totalItems)}
+              </span>{" "}
+              de <span className="font-medium">{totalItems}</span> facturas
             </p>
           </div>
           <div>
             <nav className="inline-flex rounded-md shadow-sm -space-x-px">
-              <Button
-                onClick={handlePrevious}
-                disabled={currentPage === 1}
-              >
+              <Button onClick={handlePrevious} disabled={currentPage === 1}>
                 <span className="sr-only">Anterior</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </Button>
-              
+
               {getPageNumbers().map((page, index) => (
                 <span key={index}>
-                  {page === '...' ? (
+                  {page === "..." ? (
                     <span className="inline-flex items-center p-1 m-1 text-gray-700">
                       ...
                     </span>
                   ) : (
                     <Button
-                      onClick={currentPage === page ? undefined : () => handlePageChange(page as number)}
+                      onClick={
+                        currentPage === page
+                          ? undefined
+                          : () => handlePageChange(page as number)
+                      }
                       disabled={currentPage === page}
                     >
                       {page}
@@ -226,14 +239,23 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
                   )}
                 </span>
               ))}
-              
+
               <Button
                 onClick={handleNext}
                 disabled={currentPage === totalPages}
               >
                 <span className="sr-only">Siguiente</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </Button>
             </nav>
@@ -242,4 +264,4 @@ export function InvoiceTable({ selectedInvoiceIds, onInvoiceSelection, apiData }
       </div>
     </>
   );
-} 
+}

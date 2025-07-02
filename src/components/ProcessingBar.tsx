@@ -3,9 +3,12 @@ interface ProcessingBarProps {
   onProcessSelected: () => void;
 }
 
-export function ProcessingBar({ selectedInvoiceIds, onProcessSelected }: ProcessingBarProps) {
+export function ProcessingBar({
+  selectedInvoiceIds,
+  onProcessSelected,
+}: ProcessingBarProps) {
   const selectedCount = selectedInvoiceIds.size;
-  
+
   return (
     <div className="bg-white p-4 rounded-lg border">
       <div className="flex justify-between items-center">
@@ -22,4 +25,4 @@ export function ProcessingBar({ selectedInvoiceIds, onProcessSelected }: Process
       </div>
     </div>
   );
-} 
+}

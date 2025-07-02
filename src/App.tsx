@@ -1,20 +1,28 @@
-import { Navbar, InvoiceTable, ProcessingBar, ProcessingModal, useInvoiceProcessing } from './components';
-import { useState } from 'react';
-import { useApi } from './hooks/useApi';
+import {
+  Navbar,
+  InvoiceTable,
+  ProcessingBar,
+  ProcessingModal,
+  useInvoiceProcessing,
+} from "./components";
+import { useState } from "react";
+import { useApi } from "./hooks/useApi";
 
 function App() {
-  const [initialInvoices, setInjected] = useApi('/invoices');
-  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState(new Set<string>());
-  
+  const [initialInvoices, setInjected] = useApi("/invoices");
+  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState(
+    new Set<string>(),
+  );
+
   const {
     isProcessing,
     processingProgress,
     handleProcessSelected,
-    handleCloseModal
+    handleCloseModal,
   } = useInvoiceProcessing(setInjected);
 
   const handleInvoiceSelection = (invoiceId: string, isSelected: boolean) => {
-    setSelectedInvoiceIds(prev => {
+    setSelectedInvoiceIds((prev) => {
       const newSet = new Set(prev);
       if (isSelected) {
         newSet.add(invoiceId);
@@ -37,14 +45,14 @@ function App() {
     <>
       <div className="w-screen h-screen">
         <Navbar />
-        
+
         <div className="p-6 space-y-4">
-          <ProcessingBar 
+          <ProcessingBar
             selectedInvoiceIds={selectedInvoiceIds}
             onProcessSelected={onProcessSelected}
           />
-          
-          <InvoiceTable 
+
+          <InvoiceTable
             apiData={initialInvoices}
             selectedInvoiceIds={selectedInvoiceIds}
             onInvoiceSelection={handleInvoiceSelection}
@@ -53,13 +61,10 @@ function App() {
       </div>
 
       {isProcessing && (
-        <ProcessingModal
-          onClose={onCloseModal}
-          progress={processingProgress}
-        />
+        <ProcessingModal onClose={onCloseModal} progress={processingProgress} />
       )}
     </>
-  )
+  );
 }
 
 export default App;
