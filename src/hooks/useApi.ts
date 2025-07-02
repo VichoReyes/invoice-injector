@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 
+type Invoice = {
+  id: string
+  receiverName: string
+  amount: number
+  currency: "CLP" | "USD"
+  injected?: boolean
+}
+
 interface ApiState<T> {
-  data: T | null;
+  data: Invoice[] | null;
   loading: boolean;
   error: string | null;
 }
@@ -25,7 +33,7 @@ export function useApi<T>(url: string): ApiState<T> {
         
         const response = await fetch(`${baseUrl}${url}`, {
           headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
+            'Authorization': token ? `${token}` : '',
             'Content-Type': 'application/json',
           },
         });
